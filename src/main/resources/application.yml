@@ -1,6 +1,0 @@
-spring:
-  application:
-    name: pixelcode-back
-
-  profiles:
-    active: dev
