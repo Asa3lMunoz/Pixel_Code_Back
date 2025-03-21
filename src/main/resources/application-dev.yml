@@ -1,0 +1,44 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+#logging:
+#  level:
+#    root: error
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+  jackson:
+    time-zone: America/Santiago
+    serialization:
+      fail-on-empty-beans: false # No lanza error cuando los objetos son nulos durante la serialización a JSON
+  output:
+    ansi:
+      enabled: ALWAYS # COLOR EN TERMINAL
+
+  #  Conexión a BD
+  datasource:
+    url:
+    username:
+    password:
+    driver-class-name:
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
+    hibernate.ddl-auto: none
+
+  thymeleaf:
+    encoding: UTF-8
+
+jwt:
+  secret:
+    key: 1f4510b6422837b3ccd596f432960d704e876a2489eceb4ac650436bb3b127bf
+  time:
+    expiration: 86400000 # 1 día
