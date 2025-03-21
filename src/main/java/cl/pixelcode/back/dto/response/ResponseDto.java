@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TestResponseDto {
-    private Integer id;
-    private String nombre;
+public class ResponseDto {
+    private Boolean success;
+    private String msg;
 }

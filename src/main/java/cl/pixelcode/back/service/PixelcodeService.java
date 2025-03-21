@@ -1,7 +1,8 @@
 package cl.pixelcode.back.service;
 
-import cl.pixelcode.back.dto.response.TestResponseDto;
+import cl.pixelcode.back.dto.request.ContactoRequestDto;
+import cl.pixelcode.back.dto.response.ResponseDto;
 
 public interface PixelcodeService {
-    TestResponseDto holaMundo(String nombre);
+    ResponseDto registrarContacto(ContactoRequestDto contacto);
 }

@@ -1,6 +1,7 @@
 package cl.pixelcode.back.service.impl;
 
-import cl.pixelcode.back.dto.response.TestResponseDto;
+import cl.pixelcode.back.dto.request.ContactoRequestDto;
+import cl.pixelcode.back.dto.response.ResponseDto;
 import cl.pixelcode.back.service.PixelcodeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PixelcodeServiceImpl implements PixelcodeService {
     @Override
-    public TestResponseDto holaMundo(String nombre) {
-        return new TestResponseDto(1, nombre);
+    public ResponseDto registrarContacto(ContactoRequestDto contacto) {
+        return new ResponseDto(true, "Contacto registrado correctamente");
     }
 }
