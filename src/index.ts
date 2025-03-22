@@ -1,10 +1,13 @@
 import { Elysia } from "elysia";
-import { contactRoutes } from "./routes/contactRoutes";
-import 'dotenv/config'
+import { clientRoutes } from "./routes/clientRoutes";
+import { contactRequestsRoutes } from "./routes/contactRequestsRoutes";
+import {documentsRoutes} from "./routes/documentsRoutes";
 
-const app = new Elysia()
+const app = new Elysia({ prefix: "/api/v1" })
     .get("/", () => "Hola mundo!")
-    .use(contactRoutes)
+    .use(clientRoutes)
+    .use(contactRequestsRoutes)
+    .use(documentsRoutes)
     .listen(3000);
 
 console.log(
