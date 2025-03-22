@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { contactRoutes } from "./routes/contactRoutes";
+import 'dotenv/config'
 
 const app = new Elysia()
     .get("/", () => "Hola mundo!")

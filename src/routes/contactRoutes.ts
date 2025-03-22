@@ -1,15 +1,11 @@
-import { Elysia, t } from "elysia";
-import { registerContact } from "../controllers/contactController";
+import { Elysia } from "elysia";
+import { registerContact, getContacts } from "../controllers/contactController";
+import { Contact } from "../types/contact";
 
-export const contactRoutes = (app: Elysia) =>
-    app.post("/registro-contacto",
-        ({ body }) => registerContact(body), {
-            body: t.Object({
-                nombres: t.String(),
-                apellidos: t.String(),
-                email: t.String(),
-                telefono: t.Integer(),
-                mensaje: t.String()
-            })
-        }
-    );
+export const contactRoutes = new Elysia({ prefix: "/clients" })
+  .post("/", async ({ body }) => {
+    return await registerContact(body as Contact);
+  })
+  .get("/", async () => {
+    return await getContacts();
+  });
