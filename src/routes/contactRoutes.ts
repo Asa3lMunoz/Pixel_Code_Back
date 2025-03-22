@@ -8,7 +8,7 @@ export const contactRoutes = (app: Elysia) =>
                 nombres: t.String(),
                 apellidos: t.String(),
                 email: t.String(),
-                telefono: t.String(),
+                telefono: t.Integer(),
                 mensaje: t.String()
             })
         }
