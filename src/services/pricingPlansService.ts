@@ -1,9 +1,9 @@
 import { db } from "../config/firebase";
 
-export const listContactRequests = async () => {
+export const listPricingPlans = async () => {
   try {
-    const contactRequestSnapshot = await db.collection('contactRequests').get();
-    const data = contactRequestSnapshot.docs.map(doc => ({
+    const pricingPlans = await db.collection('pricingPlans').get();
+    const data = pricingPlans.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
@@ -17,7 +17,7 @@ export const listContactRequests = async () => {
     console.error("Error listing contact requests:", error);
     return {
       success: false,
-      error: "Error al listar contactRequests",
+      error: "Error al listar pricingPlans",
       details: error instanceof Error ? error.message : String(error)
     };
   }

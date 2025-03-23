@@ -3,15 +3,15 @@ import { db } from "../config/firebase";
 export const listDocuments = async () => {
   try {
     const documentsSnapshot = await db.collection('documents').get();
-    const documents = documentsSnapshot.docs.map(doc => ({
+    const data = documentsSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
 
     return {
       success: true,
-      documents,
-      count: documents.length
+      data,
+      count: data.length
     };
   } catch (error) {
     console.error("Error listing contact requests:", error);

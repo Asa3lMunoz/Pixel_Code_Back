@@ -38,15 +38,15 @@ export const registerClient = async (client: Client) => {
 export const listClients = async () => {
   try {
     const clientsSnapshot = await db.collection('clients').get();
-    const clients = clientsSnapshot.docs.map(doc => ({
+    const data = clientsSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
 
     return {
       success: true,
-      clients,
-      count: clients.length
+      data,
+      count: data.length
     };
   } catch (error) {
     console.error("Error listing clients:", error);
