@@ -62,13 +62,13 @@ export const createContactRequest = async (contactRequest: Client) => {
 
         return {
             success: true,
-            message: "Contact request created successfully"
+            message: "Solicitud de contacto creada exitosamente"
         };
     } catch (error) {
-        console.error("Error creating contact request:", error);
+        console.error("Error creando solicitud de contacto:", error);
         return {
             success: false,
-            error: "Error al crear contactRequest",
+            error: "Error al crear solicitud de contacto",
             details: error instanceof Error ? error.message : String(error)
         };
     }
