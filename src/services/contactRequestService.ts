@@ -1,5 +1,6 @@
 import {db} from "../config/firebase";
 import {Client} from "../types/client";
+import admin from "firebase-admin";
 
 export const listContactRequests = async () => {
     try {
@@ -47,19 +48,14 @@ export const createContactRequest = async (contactRequest: Client) => {
 
         // Se incorporan los campos 'reviewed' y 'answered' al objeto contactRequest
         const contactRequestWithStatus = {
-            data: {
-                firstName: contactRequest.nombres,
-                lastName: contactRequest.apellidos,
-                email: contactRequest.email,
-                phone: contactRequest.telefono,
-                message: contactRequest.mensaje,
-                reviewed: false,
-                answered: false,
-                receivedAt: {
-                    _seconds: Math.floor(Date.now() / 1000),
-                    _nanoseconds: (Date.now() % 1000) * 1000000
-                }
-            }
+            firstName: contactRequest.nombres,
+            lastName: contactRequest.apellidos,
+            email: contactRequest.email,
+            phone: contactRequest.telefono,
+            message: contactRequest.mensaje,
+            reviewed: false,
+            answered: false,
+            receivedAt: admin.firestore.Timestamp.fromDate(new Date())
         };
 
         await db.collection('contactRequests').add(contactRequestWithStatus);
