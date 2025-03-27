@@ -54,4 +54,3 @@ A continuación se presentan los endpoints disponibles:
   "mensaje": "Hola, me gustaría recibir más información sobre sus servicios."
 }
 
-pruebaaaa
