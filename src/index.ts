@@ -5,9 +5,10 @@ import {documentsRoutes} from "./routes/documentsRoutes";
 import {pricingPlansRoutes} from "./routes/pricingPlansRoutes";
 import {servicesRoutes} from "./routes/servicesRoutes";
 import {usersRoutes} from "./routes/usersRoutes";
+import {authRoutes} from "./routes/authRoutes";
 
 const app = new Elysia({
-        prefix: "/api/v1",
+    prefix: "/api/v1",
     serve: {
         idleTimeout: 255,
     }
@@ -19,6 +20,7 @@ const app = new Elysia({
     .use(pricingPlansRoutes)
     .use(servicesRoutes)
     .use(usersRoutes)
+    .use(authRoutes)
     .listen(Bun.env.PORT ?? 3000);
 
 console.log(
