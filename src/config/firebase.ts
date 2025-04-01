@@ -12,6 +12,7 @@ admin.initializeApp({
     databaseURL: Bun.env.FIREBASE_DATABASE_URL,
 });
 
+
 const db = admin.firestore();
 
 export { db, admin };

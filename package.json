@@ -1,5 +1,5 @@
 {
-  "name": "Pixel_Code_Back",
+  "name": "PixelcodeBack",
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "elysia": "latest",
-    "firebase": "^11.5.0",
+    "firebase": "^11.6.0",
     "firebase-admin": "^13.2.0"
   },
   "devDependencies": {
