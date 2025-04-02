@@ -1,7 +1,8 @@
 export interface Client {
-    nombres: string;
-    apellidos: string;
-    email: string;
-    telefono: number;
-    mensaje: string;
+  id?: string;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  telefono: string;
+  mensaje: string;
 }

@@ -1,8 +1,9 @@
 import { db } from "../config/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 export const listUsers = async () => {
   try {
-    const users = await db.collection('users').get();
+    const users = await getDocs(collection(db, "users"));
     const data = users.docs.map(doc => ({
       id: doc.id,
       ...doc.data()

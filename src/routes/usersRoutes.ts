@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import {getUsers} from "../controllers/usersController";
+import { getUsers } from "../controllers/usersController";
 
 export const usersRoutes = new Elysia({ prefix: "/users" })
   .get("/", async () => {

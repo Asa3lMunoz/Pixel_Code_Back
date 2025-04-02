@@ -1,10 +1,10 @@
-import {db} from "../config/firebase";
-import {Client} from "../types/client";
-import admin from "firebase-admin";
+import { Client } from "../types/client";
+import { collection, getDocs } from "firebase/firestore";
+import { db, db2 } from "../config/firebase";
 
 export const listContactRequests = async () => {
     try {
-        const contactRequestSnapshot = await db.collection('contactRequests').get();
+        const contactRequestSnapshot = await getDocs(collection(db, "contactRequests"));
         const data = contactRequestSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -27,22 +27,24 @@ export const listContactRequests = async () => {
 
 export const createContactRequest = async (contactRequest: Client) => {
     try {
-        let campoFaltante = '';
+        let listaCamposFaltantes = [];
 
         if (!contactRequest.nombres) {
-            campoFaltante = 'nombres';
+            listaCamposFaltantes.push('nombres');
         } else if (!contactRequest.apellidos) {
-            campoFaltante = 'apellidos';
+            listaCamposFaltantes.push('apellidos');
         } else if (!contactRequest.email) {
-            campoFaltante = 'email';
+            listaCamposFaltantes.push('email');
         } else if (!contactRequest.telefono) {
-            campoFaltante = 'telefono';
+            listaCamposFaltantes.push('telefono');
+        } else if (!contactRequest.mensaje) {
+            listaCamposFaltantes.push('mensaje');
         }
 
-        if (campoFaltante) {
+        if (listaCamposFaltantes.length > 0) {
             return {
                 success: false,
-                error: `El campo ${campoFaltante} es requerido`
+                error: `Verifique los siguientes campos: ${listaCamposFaltantes.join(', ')}`,
             };
         }
 
@@ -55,14 +57,15 @@ export const createContactRequest = async (contactRequest: Client) => {
             message: contactRequest.mensaje,
             reviewed: false,
             answered: false,
-            receivedAt: admin.firestore.Timestamp.fromDate(new Date())
+            receivedAt: new Date(),
         };
 
-        await db.collection('contactRequests').add(contactRequestWithStatus);
+        const docRef = await db2.collection('contactRequests');
+        const doc = await docRef.add(contactRequestWithStatus);
 
         return {
             success: true,
-            message: "Solicitud de contacto creada exitosamente"
+            message: "Solicitud de contacto creada exitosamente con ID: " + doc.id,
         };
     } catch (error) {
         console.error("Error creando solicitud de contacto:", error);

@@ -1,5 +1,6 @@
 import { db } from "../config/firebase";
-import {Client} from "../types/client";
+import { collection, getDocs } from "firebase/firestore";
+import { Client } from "../types/client";
 
 export const registerClient = async (client: Client) => {
   try {
@@ -22,14 +23,18 @@ export const registerClient = async (client: Client) => {
       };
     }
 
+    // const clientsRef = getDocs(collection(db, 'clients'));
+    // const docRef = await addDoc(clientsRef, client);
+    
     return {
       success: true,
-      msg: "Contacto registrado correctamente: " + client.nombres + " " + client.apellidos
+      msg: "Contacto registrado correctamente: " + client.nombres + " " + client.apellidos,
+      // id: docRef.id
     };
   } catch (error) {
     return {
       success: false,
-      error: "Error al registrar el cliento",
+      error: "Error al registrar el cliente",
       details: error instanceof Error ? error.message : String(error)
     };
   }
@@ -37,7 +42,9 @@ export const registerClient = async (client: Client) => {
 
 export const listClients = async () => {
   try {
-    const clientsSnapshot = await db.collection('clients').get();
+    const clientsRef = collection(db, 'clients');
+    const clientsSnapshot = await getDocs(clientsRef);
+    
     const data = clientsSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
@@ -57,4 +64,3 @@ export const listClients = async () => {
     };
   }
 };
-
