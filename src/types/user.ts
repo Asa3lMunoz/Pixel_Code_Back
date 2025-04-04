@@ -2,7 +2,9 @@ export interface User {
   uid?: string;
   email: string;
   password?: string;
-  displayName?: string;
+  firstName?: string;
+  lastName?: string;
+  roles? : string[];
   phoneNumber?: string;
   photoURL?: string;
   disabled?: boolean;

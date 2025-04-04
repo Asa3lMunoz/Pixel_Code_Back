@@ -1,7 +1,8 @@
 import { UserData } from "../types/auth";
 import { auth } from "../config/firebase";
 import { AuthResponse } from "../types/user";
-import { signInWithEmailAndPassword, getIdToken } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { getUserById } from "./usersService";
 
 export const loginUser = async (login: UserData): Promise<AuthResponse> => {
     try {
@@ -14,7 +15,7 @@ export const loginUser = async (login: UserData): Promise<AuthResponse> => {
 
         // Autenticar usuario con Firebase usando nuevos métodos
         const userCredential = await signInWithEmailAndPassword(auth, login.email, login.password);
-        
+
         if (!userCredential.user) {
             return {
                 success: false,
@@ -22,24 +23,24 @@ export const loginUser = async (login: UserData): Promise<AuthResponse> => {
             };
         }
 
-        // Obtener token de autenticación
-        const token = await getIdToken(userCredential.user);
-        
         // Obtener datos del usuario del objeto userCredential
         const user = userCredential.user;
-        
+
+        const dataUsuarioEncontradoPorId = await getUserById(user.uid);
+
         return {
             success: true,
             message: "Se ha iniciado sesión correctamente.",
             user: {
                 uid: user.uid,
                 email: user.email || '',
-                displayName: user.displayName || undefined,
+                firstName: dataUsuarioEncontradoPorId?.data?.firstName || undefined,
+                lastName: dataUsuarioEncontradoPorId?.data?.lastName || undefined,
+                roles: dataUsuarioEncontradoPorId?.data?.roles || [],
                 phoneNumber: user.phoneNumber || undefined,
                 photoURL: user.photoURL || undefined,
                 emailVerified: user.emailVerified,
             },
-            token: token
         };
     } catch (error) {
         console.error("Error logging in user:", error);
