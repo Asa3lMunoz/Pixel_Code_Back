@@ -1,6 +1,7 @@
 import {db} from "../config/firebase";
 import {collection, getDocs} from "firebase/firestore";
 import {getUserById} from "./usersService";
+import {getClientById} from "./clientService";
 
 export const listDocuments = async () => {
     try {
@@ -8,6 +9,7 @@ export const listDocuments = async () => {
         const data = await Promise.all(documentsSnapshot.docs.map(async (doc) => ({
             id: doc.id,
             createdByData: await getUserById(doc.data().createdBy),
+            clientData: await getClientById(doc.data().clientId),
             ...doc.data()
         })));
         return {
