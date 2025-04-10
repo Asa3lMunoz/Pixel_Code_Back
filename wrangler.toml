@@ -1,4 +1,5 @@
 name = "pixel-code-back"
+compatibility_flags = [ "nodejs_compat" ]
 compatibility_date = "2025-04-09"
 
 main = "src/index.ts"
