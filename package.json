@@ -10,7 +10,8 @@
     "bcrypt": "^5.1.1",
     "elysia": "latest",
     "firebase": "^11.6.0",
-    "firebase-admin": "^13.2.0"
+    "firebase-admin": "^13.2.0",
+    "wrangler": "^4.9.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
