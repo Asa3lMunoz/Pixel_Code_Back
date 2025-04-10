@@ -80,3 +80,5 @@ function logApiEndpoints() {
 app.listen(Bun.env.PORT ?? 3000, () => {
     logApiEndpoints();
 });
+
+export default app;
