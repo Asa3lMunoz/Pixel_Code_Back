@@ -23,7 +23,6 @@ const app = new Elysia({
     .use(usersRoutes)
     .use(authRoutes)
     .use(cors())
-    .listen(Bun.env.PORT ?? 3000);
 
 console.log(
     `🦊 Servicio corriento en ${app.server?.hostname}:${app.server?.port}`
@@ -76,9 +75,11 @@ function logApiEndpoints() {
     console.log('\n======================================================\n');
 }
 
-// Llamar a la función para mostrar los endpoints después de que el servidor se inicie
-app.listen(Bun.env.PORT ?? 3000, () => {
-    logApiEndpoints();
-});
+if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+    app.listen(process.env.PORT ?? 3000, () => {
+        logApiEndpoints();
+        console.log(`🦊 Servicio corriendo en ${app.server?.hostname}:${app.server?.port}`);
+    });
+}
 
-export default app;
+export default app.fetch;
