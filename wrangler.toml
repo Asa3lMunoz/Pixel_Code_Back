@@ -1,4 +1,4 @@
-name = "pixel_code_back"
+name = "pixelcodeback"
 compatibility_flags = [ "nodejs_compat" ]
 compatibility_date = "2025-04-09"
 
