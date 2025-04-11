@@ -53,3 +53,35 @@ export const getUserById = async (id: string) => {
         };
     }
 };
+
+export const getUserByEmail = async (email: string) => {
+    try {
+        const users = await getDocs(collection(db, "users"));
+        const user = users.docs.find(doc => doc.data().email === email);
+
+        if (!user) {
+            return {
+                success: false,
+                error: "Usuario no encontrado."
+            };
+        }
+
+        const data = {
+            firstName: user.data().firstName,
+            lastName: user.data().lastName,
+            roles: user.data().roles,
+        };
+
+        return {
+            success: true,
+            data
+        };
+    } catch (error) {
+        console.error("Error obteniendo usuario por email:", error);
+        return {
+            success: false,
+            error: "Error al obtener usuario",
+            details: error instanceof Error ? error.message : String(error)
+        };
+    }
+}

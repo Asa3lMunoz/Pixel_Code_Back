@@ -23,6 +23,8 @@ const app = new Elysia({
     .use(usersRoutes)
     .use(authRoutes)
     .use(cors())
+    .listen(Bun.env.PORT ?? 3000);
+
 
 console.log(
     `🦊 Servicio corriento en ${app.server?.hostname}:${app.server?.port}`

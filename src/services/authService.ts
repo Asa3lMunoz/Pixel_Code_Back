@@ -1,8 +1,8 @@
 import { UserData } from "../types/auth";
 import { auth } from "../config/firebase";
 import { AuthResponse } from "../types/user";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { getUserById } from "./usersService";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import {getUserByEmail, getUserById} from "./usersService";
 
 export const loginUser = async (login: UserData): Promise<AuthResponse> => {
     try {
@@ -62,6 +62,55 @@ export const loginUser = async (login: UserData): Promise<AuthResponse> => {
         return {
             success: false,
             error: errorMessage,
+            details: error instanceof Error ? error.message : String(error)
+        };
+    }
+};
+
+export const signUpUser = async (user: UserData): Promise<AuthResponse> => {
+    try {
+        if (!user.email || !user.password) {
+            return {
+                success: false,
+                error: "Email y contraseña son requeridos."
+            };
+        }
+        // Validar que la contraseña tenga al menos 6 caracteres
+        if (user.password.length < 6) {
+            return {
+                success: false,
+                error: "La contraseña debe tener al menos 6 caracteres."
+            };
+        }
+
+        // Encontrar usuario existente por email
+        const existingUser = await getUserByEmail(user.email);
+        if (existingUser.success) {
+            return {
+                success: false,
+                error: "El email ya está registrado."
+            };
+        }
+
+        // Crear nuevo usuario en Firebase
+        const userCredential = await createUserWithEmailAndPassword(auth, user.email, user.password);
+
+        if (!userCredential.user) {
+            return {
+                success: false,
+                error: "Error al crear el usuario"
+            };
+        }
+
+        return {
+            success: true,
+            message: "Usuario creado correctamente."
+        };
+    } catch (error) {
+        console.error("Error signing up user:", error);
+        return {
+            success: false,
+            error: "Error al crear el usuario",
             details: error instanceof Error ? error.message : String(error)
         };
     }
