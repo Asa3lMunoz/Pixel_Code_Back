@@ -1,5 +1,7 @@
-import { Elysia} from "elysia";
+import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
+import { staticPlugin } from "@elysiajs/static";
+
 import { clientRoutes } from "./routes/clientRoutes";
 import { contactRequestsRoutes } from "./routes/contactRequestsRoutes";
 import { documentsRoutes } from "./routes/documentsRoutes";
@@ -7,6 +9,7 @@ import { pricingPlansRoutes } from "./routes/pricingPlansRoutes";
 import { servicesRoutes } from "./routes/servicesRoutes";
 import { usersRoutes } from "./routes/usersRoutes";
 import { authRoutes } from "./routes/authRoutes";
+import { editorRoutes } from "./routes/editor.route"; 
 
 const app = new Elysia({
     prefix: "/api/v1",
@@ -15,6 +18,8 @@ const app = new Elysia({
     }
 })
     .get("/", () => "Hola mundo!")
+    .use(cors())
+    .use(staticPlugin({ assets: "public" }))
     .use(clientRoutes)
     .use(contactRequestsRoutes)
     .use(documentsRoutes)
@@ -22,57 +27,34 @@ const app = new Elysia({
     .use(servicesRoutes)
     .use(usersRoutes)
     .use(authRoutes)
-    .use(cors())
-    .listen(Bun.env.PORT ?? 3000);
+    .use(editorRoutes);
 
-
-console.log(
-    `🦊 Servicio corriento en ${app.server?.hostname}:${app.server?.port}`
-);
-
-// Función para mostrar los endpoints disponibles en la consola
 function logApiEndpoints() {
     console.log('\n======================================================');
     console.log('=               API ENDPOINTS DISPONIBLES             =');
     console.log('======================================================\n');
 
-    // Solicitudes de Contacto
     console.log('SOLICITUDES DE CONTACTO:');
-    console.log('- GET    http://localhost:3000/api/v1/contactRequests  - Listar todas las solicitudes');
-    console.log('- POST   http://localhost:3000/api/v1/contactRequests  - Crear una nueva solicitud');
-    console.log('  Ejemplo POST Body:');
-    console.log(`  {
-    "nombres": "Mario",
-    "apellidos": "Gómez",
-    "email": "mralejandrogu@gmail.com",
-    "telefono": "979791878",
-    "mensaje": "Hola, me gustaría recibir más información sobre sus servicios."
-  }`);
+    console.log('- GET    http://localhost:3000/api/v1/contactRequests');
+    console.log('- POST   http://localhost:3000/api/v1/contactRequests');
 
-    // Usuarios
     console.log('\nUSUARIOS:');
-    console.log('- GET    http://localhost:3000/api/v1/users            - Listar todos los usuarios');
+    console.log('- GET    http://localhost:3000/api/v1/users');
 
-    // Documentos
     console.log('\nDOCUMENTOS:');
-    console.log('- GET    http://localhost:3000/api/v1/documents        - Listar todos los documentos');
+    console.log('- GET    http://localhost:3000/api/v1/documents');
 
-    // Servicios
     console.log('\nSERVICIOS:');
-    console.log('- GET    http://localhost:3000/api/v1/services         - Listar todos los servicios');
+    console.log('- GET    http://localhost:3000/api/v1/services');
 
-    // Planes de Precios
     console.log('\nPLANES DE PRECIOS:');
-    console.log('- GET    http://localhost:3000/api/v1/pricingPlans     - Listar todos los planes de precios');
+    console.log('- GET    http://localhost:3000/api/v1/pricingPlans');
 
-    // Autenticación
     console.log('\nAUTENTICACIÓN:');
-    console.log('- POST   http://localhost:3000/auth/login              - Iniciar sesión');
-    console.log('  Ejemplo POST Body:');
-    console.log(`  {
-    "email": "usuario@ejemplo.com",
-    "password": "contraseña123"
-  }`);
+    console.log('- POST   http://localhost:3000/auth/login');
+
+    console.log('\nEDITOR (UNLAYER):');
+    console.log('- POST   http://localhost:3000/api/v1/editor/guardar-json');
 
     console.log('\n======================================================\n');
 }
