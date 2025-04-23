@@ -10,8 +10,10 @@
     "@elysiajs/static": "^1.2.0",
     "bcrypt": "^5.1.1",
     "elysia": "latest",
+    "exceljs": "^4.4.0",
     "firebase": "^11.6.0",
     "firebase-admin": "^13.2.0",
+    "puppeteer": "^24.6.1",
     "wrangler": "^4.9.1"
   },
   "devDependencies": {

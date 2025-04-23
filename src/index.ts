@@ -1,3 +1,4 @@
+// index.ts
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { staticPlugin } from "@elysiajs/static";
@@ -9,61 +10,79 @@ import { pricingPlansRoutes } from "./routes/pricingPlansRoutes";
 import { servicesRoutes } from "./routes/servicesRoutes";
 import { usersRoutes } from "./routes/usersRoutes";
 import { authRoutes } from "./routes/authRoutes";
-import { editorRoutes } from "./routes/editor.route"; 
+
+import { editorRoutes } from "./routes/editor.route";
+import { certificadosRoutes } from "./routes/certificados.route"
 
 const app = new Elysia({
-    prefix: "/api/v1",
-    serve: {
-        idleTimeout: 255,
-    }
+  prefix: "/api/v1",
+  serve: {
+    idleTimeout: 255,
+  },
 })
-    .get("/", () => "Hola mundo!")
-    .use(cors())
-    .use(staticPlugin({ assets: "public" }))
-    .use(clientRoutes)
-    .use(contactRequestsRoutes)
-    .use(documentsRoutes)
-    .use(pricingPlansRoutes)
-    .use(servicesRoutes)
-    .use(usersRoutes)
-    .use(authRoutes)
-    .use(editorRoutes);
+  .get("/", () => "Hola mundo!")
+  .use(cors())
+  // Sirve todo lo que está bajo `public/` (tus .json, .pdf, imágenes, etc.)
+  .use(staticPlugin({ assets: "public" }))
+  // Rutas existentes
+  .use(clientRoutes)
+  .use(contactRequestsRoutes)
+  .use(documentsRoutes)
+  .use(pricingPlansRoutes)
+  .use(servicesRoutes)
+  .use(usersRoutes)
+  .use(authRoutes)
+  // Rutas del editor Unlayer
+  .use(editorRoutes)
+  // Ruta pública para descargar certificados PDF
+  .use(certificadosRoutes);
 
 function logApiEndpoints() {
-    console.log('\n======================================================');
-    console.log('=               API ENDPOINTS DISPONIBLES             =');
-    console.log('======================================================\n');
+  console.log("\n======================================================");
+  console.log("=               API ENDPOINTS DISPONIBLES             =");
+  console.log("======================================================\n");
 
-    console.log('SOLICITUDES DE CONTACTO:');
-    console.log('- GET    http://localhost:3000/api/v1/contactRequests');
-    console.log('- POST   http://localhost:3000/api/v1/contactRequests');
+  console.log("CONTACT REQUESTS:");
+  console.log("- GET    http://localhost:3000/api/v1/contactRequests");
+  console.log("- POST   http://localhost:3000/api/v1/contactRequests");
 
-    console.log('\nUSUARIOS:');
-    console.log('- GET    http://localhost:3000/api/v1/users');
+  console.log("\nUSERS:");
+  console.log("- GET    http://localhost:3000/api/v1/users");
 
-    console.log('\nDOCUMENTOS:');
-    console.log('- GET    http://localhost:3000/api/v1/documents');
+  console.log("\nDOCUMENTS:");
+  console.log("- GET    http://localhost:3000/api/v1/documents");
 
-    console.log('\nSERVICIOS:');
-    console.log('- GET    http://localhost:3000/api/v1/services');
+  console.log("\nSERVICES:");
+  console.log("- GET    http://localhost:3000/api/v1/services");
 
-    console.log('\nPLANES DE PRECIOS:');
-    console.log('- GET    http://localhost:3000/api/v1/pricingPlans');
+  console.log("\nPRICING PLANS:");
+  console.log("- GET    http://localhost:3000/api/v1/pricingPlans");
 
-    console.log('\nAUTENTICACIÓN:');
-    console.log('- POST   http://localhost:3000/auth/login');
+  console.log("\nAUTH:");
+  console.log("- POST   http://localhost:3000/api/v1/auth/login");
 
-    console.log('\nEDITOR (UNLAYER):');
-    console.log('- POST   http://localhost:3000/api/v1/editor/guardar-json');
+  console.log("\nEDITOR (UNLAYER):");
+  console.log("- POST   http://localhost:3000/api/v1/editor/guardar-json");
+  console.log("- POST   http://localhost:3000/api/v1/editor/generar-certificados");
 
-    console.log('\n======================================================\n');
+  console.log("\nCERTIFICADOS PÚBLICOS:");
+  console.log(
+    "- GET    http://localhost:3000/api/v1/certificados/:evento?email=usuario@ejemplo.com"
+  );
+
+  console.log("\n======================================================\n");
 }
 
-if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-    app.listen(process.env.PORT ?? 3000, () => {
-        logApiEndpoints();
-        console.log(`🦊 Servicio corriendo en ${app.server?.hostname}:${app.server?.port}`);
-    });
+if (
+  typeof process !== "undefined" &&
+  process.env.NODE_ENV !== "production"
+) {
+  app.listen(process.env.PORT ?? 3000, () => {
+    logApiEndpoints();
+    console.log(
+      `🦊 Servicio corriendo en ${app.server?.hostname}:${app.server?.port}`
+    );
+  });
 }
 
 export default app.fetch;
