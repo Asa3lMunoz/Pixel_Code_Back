@@ -10,7 +10,7 @@ import { servicesRoutes } from "./routes/servicesRoutes";
 import { usersRoutes } from "./routes/usersRoutes";
 import { authRoutes } from "./routes/authRoutes";
 import { editorRoutes } from "./routes/editor.route";
-import { certificadosRoutes } from "./routes/certificados.route";
+
 
 const app = new Elysia({
   prefix: "/api/v1",
@@ -32,8 +32,7 @@ const app = new Elysia({
   .use(authRoutes)
   // Editor de Unlayer
   .use(editorRoutes)
-  // Descarga de certificados
-  .use(certificadosRoutes);
+
 
 function logApiEndpoints() {
   console.log("\n======================================================");
@@ -64,10 +63,6 @@ function logApiEndpoints() {
   console.log("\nEDITOR (UNLAYER):");
   console.log("- POST   http://localhost:3000/api/v1/editor/guardar-json  ← Guarda diseño Unlayer");
 
-  console.log("\nCERTIFICADOS:");
-  console.log(
-    "- GET    http://localhost:3000/api/v1/certificados/:evento?email=usuario@ejemplo.com  ← Descargar PDF"
-  );
 
   console.log("\n======================================================\n");
 }
