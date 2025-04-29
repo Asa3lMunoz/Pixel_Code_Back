@@ -1,5 +1,5 @@
 import {Elysia} from "elysia";
-import {getDocuments, createDocument, getDocumentById} from "../controllers/documentsController";
+import {getDocuments, createDocument, getDocumentById, deleteDocumentById} from "../controllers/documentsController";
 
 export const documentsRoutes = new Elysia({prefix: "/documents"})
     .get("/", async () => {
@@ -8,6 +8,10 @@ export const documentsRoutes = new Elysia({prefix: "/documents"})
     .get("/:id", async ({params}) => {
         const {id} = params;
         return await getDocumentById(id);
+    })
+    .delete("/:id", async ({params}) => {
+        const {id} = params;
+        return await deleteDocumentById(id);
     })
     .post("/", async ({ body }: { body: Document }) => {
         return await createDocument(body);

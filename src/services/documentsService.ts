@@ -58,6 +58,32 @@ export const listDocumentById = async (id: string) => {
     }
 }
 
+export const deleteDocumentById = async (id: string) => {
+    try {
+        const documentDoc = await getDoc(doc(db, 'documents', id));
+
+        if (!documentDoc.data()) {
+            return {
+                success: false,
+                error: "Documento no encontrado",
+            };
+        }
+
+        await db2.collection("documents").doc(id).delete();
+        return {
+            success: true,
+            message: "Documento eliminado correctamente.",
+        };
+    } catch (error) {
+        console.error("Error deleting document:", error);
+        return {
+            success: false,
+            error: "Error al eliminar el documento",
+            details: error instanceof Error ? error.message : String(error)
+        };
+    }
+}
+
 export const createDocument = async (data: Document) => {
     // Validaciones de data (que no haya campos vacíos)
     const requiredFields = [
