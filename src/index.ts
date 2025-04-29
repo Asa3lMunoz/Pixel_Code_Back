@@ -49,6 +49,8 @@ function logApiEndpoints() {
 
   console.log("\nDOCUMENTS:");
   console.log("- GET    http://localhost:3000/api/v1/documents");
+  console.log("- POST    http://localhost:3000/api/v1/documents/{id}");
+  console.log("- DELETE    http://localhost:3000/api/v1/documents/{id}");
 
   console.log("\nSERVICES:");
   console.log("- GET    http://localhost:3000/api/v1/services");

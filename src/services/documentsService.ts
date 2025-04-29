@@ -163,6 +163,8 @@ export const createDocument = async (data: Document) => {
     }
 }
 
+
+
 // servicio que reciba una imagen y retorne la url de la imagen
 const uploadBanner = async (data: File) => {
     try {
