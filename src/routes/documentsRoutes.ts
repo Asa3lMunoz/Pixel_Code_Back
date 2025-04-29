@@ -1,10 +1,14 @@
 import {Elysia} from "elysia";
-import {getDocuments, createDocument} from "../controllers/documentsController";
+import {getDocuments, createDocument, getDocumentById} from "../controllers/documentsController";
 
 export const documentsRoutes = new Elysia({prefix: "/documents"})
     .get("/", async () => {
         return await getDocuments();
     })
-    .post("/", async ({ body }) => {
+    .get("/:id", async ({params}) => {
+        const {id} = params;
+        return await getDocumentById(id);
+    })
+    .post("/", async ({ body }: { body: Document }) => {
         return await createDocument(body);
     });

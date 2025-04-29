@@ -1,6 +1,6 @@
 import {db, app, db2} from "../config/firebase";
 import {getStorage, ref, uploadBytesResumable, getDownloadURL} from "firebase/storage";
-import {collection, getDocs} from "firebase/firestore";
+import {collection, doc, getDoc, getDocs} from "firebase/firestore";
 import {getUserById} from "./usersService";
 import {getClientById} from "./clientService";
 import {Document} from "../types/document";
@@ -29,6 +29,35 @@ export const listDocuments = async () => {
     }
 };
 
+export const listDocumentById = async (id: string) => {
+    try {
+        const documentDoc = await getDoc(doc(db, 'documents', id));
+
+        if (!documentDoc.data()) {
+            return {
+                success: false,
+                error: "Documento no encontrado",
+            };
+        }
+        // const createdByData = await getUserById(documentDoc.createdBy);
+        // const clientData = await getClientById(documentDoc.clientId);
+
+        return {
+            success: true,
+            data: {
+                docRef: documentDoc.data()
+            },
+        };
+    } catch (error) {
+        console.error("Error listing contact requests:", error);
+        return {
+            success: false,
+            error: "Error al listar documents",
+            details: error instanceof Error ? error.message : String(error)
+        };
+    }
+}
+
 export const createDocument = async (data: Document) => {
     // Validaciones de data (que no haya campos vacíos)
     const requiredFields = [
@@ -43,7 +72,8 @@ export const createDocument = async (data: Document) => {
         "clientId",
         "createdBy",
         "design",
-        "showContactInfo"
+        "showContactInfo",
+        "template"
     ];
     const missingFields = requiredFields.filter((field) => !data[field]);
 
@@ -78,7 +108,7 @@ export const createDocument = async (data: Document) => {
             design: JSON.stringify(data.design),
             showContactInfo: data.showContactInfo,
             url: "TODO",
-            template: "TODO",
+            template: data.template,
             clientId: data.clientId,
             createdBy: data.createdBy,
             updatedBy: data.createdBy,

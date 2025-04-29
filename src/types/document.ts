@@ -9,6 +9,7 @@ export interface Document {
   bannerImg: File,
   xlsxFile: File,
   design: string, // JSON del diseño
+  template: string, // HTML del template
   showContactInfo: boolean
   clientId: string,
   createdBy: string,
