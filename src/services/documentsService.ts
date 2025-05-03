@@ -4,6 +4,7 @@ import {collection, doc, getDoc, getDocs} from "firebase/firestore";
 import {getUserById} from "./usersService";
 import {getClientById} from "./clientService";
 import {Document} from "../types/document";
+import {generateDoc} from "../types/generateDoc";
 
 export const listDocuments = async () => {
     try {
@@ -20,10 +21,9 @@ export const listDocuments = async () => {
             count: data.length
         };
     } catch (error) {
-        console.error("Error listing contact requests:", error);
         return {
             success: false,
-            error: "Error al listar documents",
+            error: "Error al listar documentos",
             details: error instanceof Error ? error.message : String(error)
         };
     }
@@ -32,16 +32,12 @@ export const listDocuments = async () => {
 export const listDocumentById = async (id: string) => {
     try {
         const documentDoc = await getDoc(doc(db, 'documents', id));
-
         if (!documentDoc.data()) {
             return {
                 success: false,
                 error: "Documento no encontrado",
             };
         }
-        // const createdByData = await getUserById(documentDoc.createdBy);
-        // const clientData = await getClientById(documentDoc.clientId);
-
         return {
             success: true,
             data: {
@@ -49,10 +45,9 @@ export const listDocumentById = async (id: string) => {
             },
         };
     } catch (error) {
-        console.error("Error listing contact requests:", error);
         return {
             success: false,
-            error: "Error al listar documents",
+            error: "Error al listar document",
             details: error instanceof Error ? error.message : String(error)
         };
     }
@@ -135,7 +130,7 @@ export const createDocument = async (data: Document) => {
             downloadLink: data.downloadLink,
             header: data.header,
             documentFormat: data.documentFormat,
-            bannerImg: await uploadBanner(data.bannerImg),
+            bannerUrl: await uploadBanner(data.bannerImg),
             headers: headers,
             rows: dataArray.pop(0), // eliminar la primera fila que son los headers
             design: JSON.stringify(data.design),
@@ -170,9 +165,93 @@ export const createDocument = async (data: Document) => {
     }
 }
 
+export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
+    // 1. Obtener el documento por id
+    const evento = await listDocumentById(body.idEvento);
+    if (!evento.success) {
+        return {
+            success: false,
+            error: "Error al obtener el documento",
+            details: evento.error
+        };
+    }
+
+    const eventoData = evento.data?.docRef;
+
+    // 2. Buscar si es que el email existe dentro de los usuarios del documento encontrado por id (si no existe, retornar un mensaje de error)
+    const participante = eventoData?.rows.find((row: any) => row.email === body.email);
+
+    if (!participante) {
+        return {
+            success: false,
+            error: "Usuario no encontrado",
+            details: "El email proporcionado no se encuentra en la lista de participantes."
+        };
+    }
+
+    // 3. Obtener el html del documento y reemplazar los datos del usuario (nombre, apellido, etc) por los datos del usuario que se encuentra en el documento
+    let htmlContent = eventoData?.template;
+
+    // 3.1 Buscar todas las variables del html que empiezan con {{ y terminan con }} y reemplazarlas por los datos del usuario de mismo nombre
+    const regex = /{{(.*?)}}/g;
+    const matches = htmlContent.match(regex);
+
+    // 3.2 Extraer las dimensiones del diseño para el PDF
+    let width = 792; // Valores por defecto
+    let height = 612;
+
+    try {
+        if (eventoData?.design) {
+            const designObj = JSON.parse(eventoData.design);
+
+            // Navegar a través del objeto para encontrar la información de backgroundImage
+            const backgroundImage = designObj?.body?.rows?.[0]?.values?.backgroundImage;
+
+            if (backgroundImage) {
+                width = backgroundImage.width || width;
+                height = backgroundImage.height || height;
+                console.log(`Dimensiones extraídas: ${width}x${height}`);
+            }
+        }
+    } catch (error) {
+        console.error("Error al parsear el diseño:", error);
+    }
 
 
-// servicio que reciba una imagen y retorne la url de la imagen
+    if (matches) {
+        matches.forEach((match: any) => {
+            const variable = match.replace(/{{|}}/g, "").trim().toLowerCase();
+            const value = participante[variable];
+            htmlContent = htmlContent.replace(match, value);
+        });
+    }
+    // 4. generar PDF con el html generado en el paso 3 y retornarlo como base64
+    const pdf = require("html-pdf");
+    const options = {
+        orientation: "landscape",
+        border: 0,
+        quality: 100,
+        width: width + 'px',
+        height: height + 'px',
+    };
+    const pdfBuffer = await new Promise((resolve, reject) => {
+        pdf.create(htmlContent, options).toBuffer((err: any, buffer: any) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(buffer);
+            }
+        });
+    });
+    const base64 = pdfBuffer.toString("base64");
+    return {
+        success: true,
+        message: "PDF generado correctamente.",
+        data: base64
+    };
+}
+
+// servicio que reciba una imagen y retorne la url de la imagen en firestore
 const uploadBanner = async (data: File) => {
     try {
         // Obtener referencia a Firebase Storage
