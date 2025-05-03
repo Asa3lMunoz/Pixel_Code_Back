@@ -1,7 +1,6 @@
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { staticPlugin } from "@elysiajs/static";
-
 import { clientRoutes } from "./routes/clientRoutes";
 import { contactRequestsRoutes } from "./routes/contactRequestsRoutes";
 import { documentsRoutes } from "./routes/documentsRoutes";

@@ -4,7 +4,6 @@ import {
     listDocumentById,
     deleteDocumentById as deleteDocumentByIdService
 } from "../services/documentsService";
-import {Document} from "../types/document";
 
 export const getDocuments = async () => {
     return await listDocuments();
@@ -18,6 +17,6 @@ export const deleteDocumentById = async (id: string) => {
     return await deleteDocumentByIdService(id);
 }
 
-export const createDocument = async (body: Document) => {
+export const createDocument = async (body: FormData) => {
     return await createDocumentService(body);
 }

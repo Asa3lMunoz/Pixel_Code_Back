@@ -85,6 +85,14 @@ export const deleteDocumentById = async (id: string) => {
 }
 
 export const createDocument = async (data: Document) => {
+    if (!data) {
+        return {
+            success: false,
+            error: "Error al crear el documento",
+            details: "No se ha recibido data. Inténtelo nuevamente."
+        };
+    }
+
     // Validaciones de data (que no haya campos vacíos)
     const requiredFields = [
         "name",
@@ -110,7 +118,6 @@ export const createDocument = async (data: Document) => {
             details: `Los siguientes campos son obligatorios: ${missingFields.join(", ")}`
         };
     }
-
     try {
         // Leer el archivo xlsx y dejar en un array la primera fila que son los headers
         const xlsxFile = await data.xlsxFile.arrayBuffer();
