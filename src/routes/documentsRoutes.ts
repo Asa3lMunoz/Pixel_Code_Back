@@ -13,6 +13,6 @@ export const documentsRoutes = new Elysia({prefix: "/documents"})
         const {id} = params;
         return await deleteDocumentById(id);
     })
-    .post("/", async ({ body }: { body: FormData }) => {
+    .post("/", async ({ body }: { body: Document }) => {
         return await createDocument(body);
-    })
+    });
