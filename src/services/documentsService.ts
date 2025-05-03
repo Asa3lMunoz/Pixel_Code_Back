@@ -135,7 +135,7 @@ export const createDocument = async (data: Document) => {
             rows: dataArray.pop(0), // eliminar la primera fila que son los headers
             design: JSON.stringify(data.design),
             showContactInfo: data.showContactInfo,
-            url: "TODO",
+            url: "",
             template: data.template,
             clientId: data.clientId,
             createdBy: data.createdBy,
@@ -145,16 +145,25 @@ export const createDocument = async (data: Document) => {
             lastupdate: new Date()
         }
 
-        const documentsRef = await db2.collection("documents");
+        const documentsRef = db2.collection("documents");
         const docRef = await documentsRef.add(newDocument);
+
+        const finalUrl = `/Pixel_Code/certificado/${docRef.id}`;
+        await docRef.update({ url: finalUrl });
+
         return {
             success: true,
             message: "Documento creado correctamente.",
             id: docRef.id,
             data: {
-                newDocument,
-            },
+                newDocument: {
+                    ...newDocument,
+                    url: finalUrl
+                }
+            }
         };
+
+
     } catch (error) {
         console.error("Error creating document:", error);
         return {
