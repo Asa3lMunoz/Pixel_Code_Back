@@ -130,9 +130,10 @@ export const createDocument = async (data: Document) => {
             downloadLink: data.downloadLink,
             header: data.header,
             documentFormat: data.documentFormat,
+            downloadHistory: [],
             bannerUrl: await uploadBanner(data.bannerImg),
             headers: headers,
-            rows: dataArray.pop(0), // eliminar la primera fila que son los headers
+            rows: [dataArray.pop(0)], // eliminar la primera fila que son los headers
             design: JSON.stringify(data.design),
             showContactInfo: data.showContactInfo,
             url: "",
@@ -149,7 +150,7 @@ export const createDocument = async (data: Document) => {
         const docRef = await documentsRef.add(newDocument);
 
         const finalUrl = `/Pixel_Code/certificado/${docRef.id}`;
-        await docRef.update({ url: finalUrl });
+        await docRef.update({url: finalUrl});
 
         return {
             success: true,
@@ -188,6 +189,7 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     const eventoData = evento.data?.docRef;
 
     // 2. Buscar si es que el email existe dentro de los usuarios del documento encontrado por id (si no existe, retornar un mensaje de error)
+    console.log(eventoData);
     const participante = eventoData?.rows.find((row: any) => row.email === body.email);
 
     if (!participante) {
@@ -253,6 +255,30 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
         });
     });
     const base64 = pdfBuffer.toString("base64");
+
+    // 5. pasar el email a usuarios que descargaron el pdf
+    const downloadHistory = eventoData?.downloadHistory || [];
+
+    // Buscar si el email ya existe en el historial
+    const existingEntry = downloadHistory.find((entry: any) => entry.email === body.email);
+
+    if (existingEntry) {
+        // Si existe, incrementar el contador de descargas
+        existingEntry.downloads += 1;
+    } else {
+        // Si no existe, agregar un nuevo registro
+        downloadHistory.push({
+            email: body.email,
+            downloads: 1,
+        });
+    }
+
+    // Actualizar el historial de descargas en Firestore
+    const documentRef = db2.collection("documents").doc(body.idEvento);
+    await documentRef.update({
+        downloadHistory: downloadHistory,
+        lastupdate: new Date()
+    });
     return {
         success: true,
         message: "PDF generado correctamente.",
