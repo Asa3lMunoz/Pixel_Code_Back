@@ -121,7 +121,7 @@ export const createDocument = async (data: Document) => {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const headers = xlsx.utils.sheet_to_json(worksheet, {header: 1})[0];
-        const dataArray = xlsx.utils.sheet_to_json(worksheet, {header: headers});
+        const dataArray = xlsx.utils.sheet_to_json(worksheet, {header: headers}).slice(1);
 
         const newDocument = {
             name: data.name,
@@ -133,7 +133,7 @@ export const createDocument = async (data: Document) => {
             downloadHistory: [],
             bannerUrl: await uploadBanner(data.bannerImg),
             headers: headers,
-            rows: [dataArray.pop(0)], // eliminar la primera fila que son los headers
+            rows: dataArray, // eliminar la primera fila que son los headers
             design: JSON.stringify(data.design),
             showContactInfo: data.showContactInfo,
             url: "",
@@ -166,7 +166,7 @@ export const createDocument = async (data: Document) => {
 
 
     } catch (error) {
-        console.error("Error creating document:", error);
+        console.error("Error creating document:", error.message);
         return {
             success: false,
             error: "Error al crear el documento",
@@ -189,7 +189,6 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     const eventoData = evento.data?.docRef;
 
     // 2. Buscar si es que el email existe dentro de los usuarios del documento encontrado por id (si no existe, retornar un mensaje de error)
-    console.log(eventoData);
     const participante = eventoData?.rows.find((row: any) => row.email === body.email);
 
     if (!participante) {
