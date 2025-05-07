@@ -7,6 +7,7 @@ import {
     refactorHtmlAndDownloadPdf
 } from "../controllers/documentsController";
 import {generateDoc} from "../types/generateDoc";
+import {Document} from "../types/document";
 
 export const documentsRoutes = new Elysia({prefix: "/documents"})
     .get("/", async () => {

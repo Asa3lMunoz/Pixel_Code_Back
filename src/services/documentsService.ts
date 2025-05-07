@@ -113,8 +113,9 @@ export const createDocument = async (data: Document) => {
             details: `Los siguientes campos son obligatorios: ${missingFields.join(", ")}`
         };
     }
+
     try {
-        // Leer el archivo xlsx y dejar en un array la primera fila que son los headers
+        // Leer el archivo xlsx y preparar datos
         const xlsxFile = await data.xlsxFile.arrayBuffer();
         const xlsx = require("xlsx");
         const workbook = xlsx.read(xlsxFile, {type: "array"});
@@ -123,7 +124,7 @@ export const createDocument = async (data: Document) => {
         const headers = xlsx.utils.sheet_to_json(worksheet, {header: 1})[0];
         const dataArray = xlsx.utils.sheet_to_json(worksheet, {header: headers}).slice(1);
 
-        const newDocument = {
+        const documentData = {
             name: data.name,
             description: data.description,
             category: data.category,
@@ -144,36 +145,69 @@ export const createDocument = async (data: Document) => {
             createdAt: new Date().toISOString(),
             createdate: new Date(),
             lastupdate: new Date()
-        }
+        };
 
         const documentsRef = db2.collection("documents");
-        const docRef = await documentsRef.add(newDocument);
 
-        const finalUrl = `/Pixel_Code/certificado/${docRef.id}`;
-        await docRef.update({url: finalUrl});
+        if (data.uid) {
+            // Si existe un `uid`, intentamos actualizar el documento existente
+            const docRef = documentsRef.doc(data.uid);
+            const existingDoc = await docRef.get();
 
-        return {
-            success: true,
-            message: "Documento creado correctamente.",
-            id: docRef.id,
-            data: {
-                newDocument: {
-                    ...newDocument,
-                    url: finalUrl
-                }
+            if (!existingDoc.exists) {
+                return {
+                    success: false,
+                    error: "Documento no encontrado",
+                    details: `No se encontró un documento con el uid proporcionado: ${data.uid}`
+                };
             }
-        };
 
+            // Actualización del documento existente
+            await docRef.update({
+                ...documentData,
+                lastupdate: new Date() // Actualiza la fecha de la última modificación
+            });
 
-    } catch (error) {
-        console.error("Error creating document:", error.message);
+            return {
+                success: true,
+                message: "Documento actualizado correctamente.",
+                id: data.uid,
+                data: {
+                    updatedDocument: {
+                        ...documentData,
+                        id: data.uid
+                    }
+                }
+            };
+        } else {
+            // Si no existe `uid`, creamos un nuevo documento
+            const docRef = await documentsRef.add(documentData);
+
+            const finalUrl = `/Pixel_Code/certificado/${docRef.id}`;
+            await docRef.update({url: finalUrl});
+
+            return {
+                success: true,
+                message: "Documento creado correctamente.",
+                id: docRef.id,
+                data: {
+                    newDocument: {
+                        ...documentData,
+                        url: finalUrl
+                    }
+                }
+            };
+        }
+    } catch (err) {
+        console.error("Error al procesar el documento:", err);
         return {
             success: false,
-            error: "Error al crear el documento",
-            details: error instanceof Error ? error.message : String(error)
+            error: "Error al procesar el documento",
+            details: err instanceof Error ? err.message : String(err)
         };
     }
-}
+};
+
 
 export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     // 1. Obtener el documento por id
@@ -207,26 +241,8 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     const matches = htmlContent.match(regex);
 
     // 3.2 Extraer las dimensiones del diseño para el PDF
-    let width = 792; // Valores por defecto
-    let height = 612;
-
-    try {
-        if (eventoData?.design) {
-            const designObj = JSON.parse(eventoData.design);
-
-            // Navegar a través del objeto para encontrar la información de backgroundImage
-            const backgroundImage = designObj?.body?.rows?.[0]?.values?.backgroundImage;
-
-            if (backgroundImage) {
-                width = backgroundImage.width || width;
-                height = backgroundImage.height || height;
-                console.log(`Dimensiones extraídas: ${width}x${height}`);
-            }
-        }
-    } catch (error) {
-        console.error("Error al parsear el diseño:", error);
-    }
-
+    let width = 612;
+    let height = 450;
 
     if (matches) {
         matches.forEach((match: any) => {
@@ -244,7 +260,7 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
         width: width + 'px',
         height: height + 'px',
     };
-    const pdfBuffer = await new Promise((resolve, reject) => {
+    const pdfBuffer: any = await new Promise((resolve, reject) => {
         pdf.create(htmlContent, options).toBuffer((err: any, buffer: any) => {
             if (err) {
                 reject(err);
