@@ -161,6 +161,11 @@ export const createDocument = async (data: Document) => {
             delete documentData.rows;
         }
 
+        if (!(data.bannerImg instanceof File) && documentData.bannerUrl) {
+            // @ts-ignore
+            delete documentData.bannerUrl;
+        }
+
         const documentsRef = db2.collection("documents");
 
         if (data.uid) {
