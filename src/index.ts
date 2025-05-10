@@ -39,16 +39,16 @@ function logApiEndpoints() {
   console.log("======================================================\n");
 
   console.log("CONTACT REQUESTS:");
-  console.log("- GET    http://localhost:3000/api/v1/contactRequests");
-  console.log("- POST   http://localhost:3000/api/v1/contactRequests");
+  console.log("- GET     http://localhost:3000/api/v1/contactRequests");
+  console.log("- POST    http://localhost:3000/api/v1/contactRequests");
 
   console.log("\nUSERS:");
-  console.log("- GET    http://localhost:3000/api/v1/users");
+  console.log("- GET     http://localhost:3000/api/v1/users");
 
   console.log("\nDOCUMENTS:");
-  console.log("- GET    http://localhost:3000/api/v1/documents");
-  console.log("- POST    http://localhost:3000/api/v1/documents/{id}");
-  console.log("- DELETE    http://localhost:3000/api/v1/documents/{id}");
+  console.log("- GET     http://localhost:3000/api/v1/documents");
+  console.log("- POST    http://localhost:3000/api/v1/documents");
+  console.log("- DELETE  http://localhost:3000/api/v1/documents/{id}");
 
   console.log("\nSERVICES:");
   console.log("- GET    http://localhost:3000/api/v1/services");

@@ -1,10 +1,10 @@
-import {db, app, db2} from "../config/firebase";
-import {getStorage, ref, uploadBytesResumable, getDownloadURL} from "firebase/storage";
-import {collection, doc, getDoc, getDocs} from "firebase/firestore";
-import {getUserById} from "./usersService";
-import {getClientById} from "./clientService";
-import {Document} from "../types/document";
-import {generateDoc} from "../types/generateDoc";
+import { db, app, db2 } from "../config/firebase";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { getUserById } from "./usersService";
+import { getClientById } from "./clientService";
+import { Document } from "../types/document";
+import { generateDoc } from "../types/generateDoc";
 
 export const listDocuments = async () => {
     try {
@@ -126,11 +126,11 @@ export const createDocument = async (data: Document) => {
         if (data.xlsxFile) {
             const xlsxFile = await data.xlsxFile.arrayBuffer();
             const xlsx = require("xlsx");
-            const workbook = xlsx.read(xlsxFile, {type: "array"});
+            const workbook = xlsx.read(xlsxFile, { type: "array" });
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
-            headers = xlsx.utils.sheet_to_json(worksheet, {header: 1})[0];
-            dataArray = xlsx.utils.sheet_to_json(worksheet, {header: headers}).slice(1);
+            headers = xlsx.utils.sheet_to_json(worksheet, { header: 1 })[0];
+            dataArray = xlsx.utils.sheet_to_json(worksheet, { header: headers }).slice(1);
         }
 
         let documentData = {
@@ -203,7 +203,7 @@ export const createDocument = async (data: Document) => {
             const docRef = await documentsRef.add(documentData);
 
             const finalUrl = `/Pixel_Code/certificado/${docRef.id}`;
-            await docRef.update({url: finalUrl});
+            await docRef.update({ url: finalUrl });
 
             return {
                 success: true,
@@ -276,9 +276,12 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
         orientation: "landscape",
         border: 0,
         quality: 100,
-        width: width + 'px',
-        height: height + 'px',
+        width: "277mm",
+        height: "234mm"
     };
+
+
+
     const pdfBuffer: any = await new Promise((resolve, reject) => {
         pdf.create(htmlContent, options).toBuffer((err: any, buffer: any) => {
             if (err) {
@@ -331,7 +334,7 @@ const uploadBanner = async (data: File) => {
 
         // Subir el archivo a Firebase Storage
         const fileBuffer = await data.arrayBuffer();
-        const metadata = {contentType: data.type};
+        const metadata = { contentType: data.type };
         const uploadTask = await uploadBytesResumable(storageRef, fileBuffer, metadata);
 
         return await getDownloadURL(uploadTask.ref)
