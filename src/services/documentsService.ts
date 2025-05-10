@@ -97,7 +97,7 @@ export const createDocument = async (data: Document) => {
         "header",
         "documentFormat",
         "bannerImg",
-        "xlsxFile",
+        // "xlsxFile",
         "clientId",
         "createdBy",
         "design",
