@@ -89,7 +89,7 @@ export const createDocument = async (data: Document) => {
     }
 
     // Validaciones de data (que no haya campos vacíos)
-    const requiredFields = [
+    let requiredFields = [
         "name",
         "description",
         "category",
@@ -97,13 +97,18 @@ export const createDocument = async (data: Document) => {
         "header",
         "documentFormat",
         "bannerImg",
-        // "xlsxFile",
+        "xlsxFile",
         "clientId",
         "createdBy",
         "design",
         "showContactInfo",
         "template"
     ];
+
+    if (data.uid) {
+        requiredFields = requiredFields.filter((field) => field !== "xlsxFile");
+    }
+
     const missingFields = requiredFields.filter((field) => !data[field]);
 
     if (missingFields.length > 0) {
@@ -115,27 +120,31 @@ export const createDocument = async (data: Document) => {
     }
 
     try {
+        let headers = [];
+        let dataArray = [];
         // Leer el archivo xlsx y preparar datos
-        const xlsxFile = await data.xlsxFile.arrayBuffer();
-        const xlsx = require("xlsx");
-        const workbook = xlsx.read(xlsxFile, {type: "array"});
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const headers = xlsx.utils.sheet_to_json(worksheet, {header: 1})[0];
-        const dataArray = xlsx.utils.sheet_to_json(worksheet, {header: headers}).slice(1);
+        if (data.xlsxFile) {
+            const xlsxFile = await data.xlsxFile.arrayBuffer();
+            const xlsx = require("xlsx");
+            const workbook = xlsx.read(xlsxFile, {type: "array"});
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            headers = xlsx.utils.sheet_to_json(worksheet, {header: 1})[0];
+            dataArray = xlsx.utils.sheet_to_json(worksheet, {header: headers}).slice(1);
+        }
 
-        const documentData = {
+        let documentData = {
             name: data.name,
             description: data.description,
             category: data.category,
             downloadLink: data.downloadLink,
             header: data.header,
-            documentFormat: data.documentFormat,
+            pageFormat: "landscape",
             downloadHistory: [],
             bannerUrl: await uploadBanner(data.bannerImg),
             headers: headers,
             rows: dataArray, // eliminar la primera fila que son los headers
-            design: JSON.stringify(data.design),
+            design: data.design,
             showContactInfo: data.showContactInfo,
             url: "",
             template: data.template,
@@ -146,6 +155,11 @@ export const createDocument = async (data: Document) => {
             createdate: new Date(),
             lastupdate: new Date()
         };
+
+        if (headers.length === 0) {
+            delete documentData.headers;
+            delete documentData.rows;
+        }
 
         const documentsRef = db2.collection("documents");
 
