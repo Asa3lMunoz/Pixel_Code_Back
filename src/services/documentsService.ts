@@ -276,8 +276,8 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
         orientation: "landscape",
         border: 0,
         quality: 100,
-        width: "277mm",
-        height: "234mm"
+        width: "11in",
+        height: "8.5in"
     };
 
 
