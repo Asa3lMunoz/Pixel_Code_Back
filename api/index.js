@@ -2,7 +2,7 @@ import Elysia from 'elysia'
 import { app } from '../src/index.js'
 import * as functions from 'firebase-functions'
 
-const app = new Elysia()
+new Elysia()
     .mount(app)
     .onError(({code}) => {
         console.error(`Error: ${code}`)
