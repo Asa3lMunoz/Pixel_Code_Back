@@ -1,6 +1,5 @@
 import {Elysia} from "elysia";
 import {cors} from "@elysiajs/cors";
-import {staticPlugin} from "@elysiajs/static";
 import {clientRoutes} from "./routes/clientRoutes";
 import {contactRequestsRoutes} from "./routes/contactRequestsRoutes";
 import {documentsRoutes} from "./routes/documentsRoutes";
@@ -18,9 +17,6 @@ export const app = new Elysia({
 })
     .get("/", () => "Hola mundo!")
     .use(cors())
-    // Sirve todo lo que esté en /public (planillas, certificados, banners, etc.)
-    .use(staticPlugin({assets: "public"}))
-    // Rutas principales
     .use(clientRoutes)
     .use(contactRequestsRoutes)
     .use(documentsRoutes)
@@ -65,8 +61,9 @@ function logApiEndpoints() {
     console.log("\n======================================================\n");
 }
 
-if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
-    app.listen(process.env.PORT ?? 3000, () => {
+if (typeof process !== "undefined") {
+    const port = process.env.PORT ?? 3000;
+    app.listen(port, () => {
         logApiEndpoints();
         console.log(`🦊 Servicio corriendo en ${app.server?.hostname}:${app.server?.port}`);
     });

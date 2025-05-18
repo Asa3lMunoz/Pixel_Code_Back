@@ -1,9 +1,0 @@
-{
-  "projects": {
-    "default": "pixel-code-dev",
-    "test": "pixelcodetest",
-    "PixelCodePro": "pixelcodepro-28b9c"
-  },
-  "targets": {},
-  "etags": {}
-}
