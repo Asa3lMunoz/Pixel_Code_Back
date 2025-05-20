@@ -15,20 +15,44 @@ const firebaseConfig = {
     measurementId: process.env.FIREBASE_MEASUREMENT_ID,
 };
 
+// Initialize Firebase Admin
 const serviceAccount = {
     projectId: process.env.FIREBASE_PROJECT_ID,
     privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
 } as ServiceAccount;
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: process.env.FIREBASE_DATABASE_URL,
-});
+try {
+    console.log('Firebase Config:', {
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        databaseURL: process.env.FIREBASE_DATABASE_URL,
+        hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
+        hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL
+    });
+    
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: process.env.FIREBASE_DATABASE_URL,
+    });
+    console.log('Firebase Admin initialized successfully');
+} catch (error) {
+    console.error('Error initializing Firebase Admin:', error);
+}
 
+// Initialize Firebase Client
+let app;
+let db;
+let auth;
+let db2;
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const db2 = admin.firestore();
-const auth = getAuth(app);
+try {
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+    db2 = admin.firestore();
+    console.log('Firebase Client initialized successfully');
+} catch (error) {
+    console.error('Error initializing Firebase Client:', error);
+}
+
 export { app, auth, db, db2 }
