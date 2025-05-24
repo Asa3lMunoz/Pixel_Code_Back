@@ -64,7 +64,7 @@ function logApiEndpoints() {
 if (typeof process !== "undefined") {
     const port = process.env.PORT ?? 3000;
     app.listen(port, () => {
-        logApiEndpoints();
+        // logApiEndpoints();
         console.log(`🦊 Servicio corriendo en ${app.server?.hostname}:${app.server?.port}`);
     });
 }

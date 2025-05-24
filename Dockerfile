@@ -1,39 +1,29 @@
-FROM oven/bun AS build
+FROM oven/bun
 
 WORKDIR /app
 
-# Cache packages installation
-COPY package.json package.json
-COPY bun.lock bun.lock
-COPY .env .env
+COPY package.json .
+#COPY bun.lockb .
 
-RUN bun install
+RUN bun install --production
 
-COPY ./src ./src
+# Install system dependencies for PhantomJS
+RUN apt-get update && apt-get install -y \
+    bzip2 \
+    libfontconfig1 \
+    libfreetype6 \
+    libfreetype6-dev \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN bun add phantomjs-prebuilt
+
+COPY src src
+COPY tsconfig.json .
+COPY .env .
+# COPY public public
 
 ENV NODE_ENV=production
-ENV PORT=3000
-
-RUN bun build \
-	--compile \
-	--minify-whitespace \
-	--minify-syntax \
-	--target bun \
-	--outfile server \
-	./src/index.ts
-
-FROM gcr.io/distroless/base
-
-WORKDIR /app
-
-COPY --from=build /app/server server
-COPY --from=build /app/.env .env
-
-# Ensure all environment variables are available
-ENV NODE_ENV=production
-ENV PORT=3000
-
-# Start the server with environment variables
-CMD ["./server"]
+CMD ["bun", "src/index.ts"]
 
 EXPOSE 3000
