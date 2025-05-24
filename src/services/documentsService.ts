@@ -240,7 +240,7 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     }
 
     const eventoData = evento.data?.docRef;
-
+    const designObj = JSON.parse(eventoData.design);
     // 2. Buscar si es que el email existe dentro de los usuarios del documento encontrado por id (si no existe, retornar un mensaje de error)
     const participante = eventoData?.rows.find((row: any) => row.email === body.email);
 
@@ -260,8 +260,8 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     const matches = htmlContent.match(regex);
 
     // 3.2 Extraer las dimensiones del diseño para el PDF
-    let width = 612;
-    let height = 450;
+    let width = designObj.body.rows[0].values.backgroundImage.width + "px";
+    let height = designObj.body.rows[0].values.backgroundImage.height + "px";
 
     if (matches) {
         matches.forEach((match: any) => {
@@ -273,14 +273,19 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     // 4. generar PDF con el html generado en el paso 3 y retornarlo como base64
     const pdf = require("html-pdf");
     const options = {
-        orientation: "landscape",
-        border: 0,
-        quality: 100,
+        type: "pdf",
         width: "11in",
-        height: "8.5in"
+        height: "8.5in",
+        border: "0"
     };
 
-
+    htmlContent = htmlContent.replace(
+        /<body([^>]*)>/i,
+        `<body$1><div style="height: ${height}; overflow: hidden;">`
+    ).replace(
+        /<\/body>/i,
+        '</div></body>'
+    );
 
     const pdfBuffer: any = await new Promise((resolve, reject) => {
         pdf.create(htmlContent, options).toBuffer((err: any, buffer: any) => {
