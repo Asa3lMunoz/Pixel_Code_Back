@@ -272,20 +272,27 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     }
     // 4. generar PDF con el html generado en el paso 3 y retornarlo como base64
     const pdf = require("html-pdf");
+
+    // este método funciona SOLOOO EN DOCKER. cuando se ejecute en local se ejecutarán los documentos incorrectamente.
     const options = {
         type: "pdf",
-        width: "11in",
-        height: "8.5in",
-        border: "0"
+        format: "A4",
+        orientation: "landscape",
+        width: width,
+        height: height,
+        border: "0",
+        phantomPath: require('phantomjs-prebuilt').path,
+        phantomArgs: ['--web-security=no', '--ignore-ssl-errors=yes'],
+        renderDelay: 1000,
+        timeout: 30000
     };
 
-    htmlContent = htmlContent.replace(
-        /<body([^>]*)>/i,
-        `<body$1><div style="height: ${height}; overflow: hidden;">`
-    ).replace(
-        /<\/body>/i,
-        '</div></body>'
-    );
+    // Add a wrapper div with explicit dimensions
+    htmlContent = `
+        <div style="width: ${width}; height: ${height}; overflow: hidden; position: relative;">
+            ${htmlContent}
+        </div>
+    `;
 
     const pdfBuffer: any = await new Promise((resolve, reject) => {
         pdf.create(htmlContent, options).toBuffer((err: any, buffer: any) => {
