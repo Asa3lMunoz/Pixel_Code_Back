@@ -240,7 +240,7 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     }
 
     const eventoData = evento.data?.docRef;
-    const designObj = JSON.parse(eventoData.design);
+    const designObj = JSON.parse(eventoData?.design);
     // 2. Buscar si es que el email existe dentro de los usuarios del documento encontrado por id (si no existe, retornar un mensaje de error)
     const participante = eventoData?.rows.find((row: any) => row.email === body.email);
 
@@ -266,7 +266,13 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     if (matches) {
         matches.forEach((match: any) => {
             const variable = match.replace(/{{|}}/g, "").trim().toLowerCase();
-            const value = participante[variable];
+            let value = participante[variable];
+
+            // Si la variable es "undefined", se asigna un string vacío para evitar errores en el PDF
+            if (value == undefined) {
+                value = "";
+            }
+
             htmlContent = htmlContent.replace(match, value);
         });
     }
