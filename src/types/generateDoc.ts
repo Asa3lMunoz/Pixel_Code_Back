@@ -1,4 +1,5 @@
 export interface generateDoc {
   idEvento: string,
-  email: string
+  email?: string,
+  folio?: number
 }

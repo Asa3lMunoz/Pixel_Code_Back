@@ -1,4 +1,4 @@
-import {Elysia} from "elysia";
+import {Elysia, t} from "elysia";
 import {
     getDocuments,
     createDocument,
@@ -21,8 +21,13 @@ export const documentsRoutes = new Elysia({prefix: "/documents"})
         const {id} = params;
         return await deleteDocumentById(id);
     })
-    .post("/", async ({ body }: { body: Document }) => {
-        return await createDocument(body);
+    .post("/", async ({ body }) => {
+        return await createDocument(body as Document);
+    }, {
+        body: t.Object({
+            bannerImg: t.Optional(t.File()),
+            xlsxFile:  t.Optional(t.File()),
+        }, { additionalProperties: true })
     })
     .post("/get-certificado", async ({ body }: { body: generateDoc }) => {
         return await refactorHtmlAndDownloadPdf(body);

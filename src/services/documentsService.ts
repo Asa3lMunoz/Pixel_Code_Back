@@ -1,4 +1,5 @@
 import { db, app, db2 } from "../config/firebase";
+import { asignarFolios } from "./folioService";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { getUserById } from "./usersService";
@@ -122,6 +123,7 @@ export const createDocument = async (data: Document) => {
     try {
         let headers = [];
         let dataArray = [];
+        console.log("xlsxFile recibido:", !!data.xlsxFile);
         // Leer el archivo xlsx y preparar datos
         if (data.xlsxFile) {
             const xlsxFile = await data.xlsxFile.arrayBuffer();
@@ -131,6 +133,9 @@ export const createDocument = async (data: Document) => {
             const worksheet = workbook.Sheets[sheetName];
             headers = xlsx.utils.sheet_to_json(worksheet, { header: 1 })[0];
             dataArray = xlsx.utils.sheet_to_json(worksheet, { header: headers }).slice(1);
+            console.log("dataArray antes:", JSON.stringify(dataArray[0]));
+            dataArray = await asignarFolios(dataArray);
+            console.log("dataArray después:", JSON.stringify(dataArray[0]));
         }
 
         let documentData = {
@@ -241,14 +246,26 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
 
     const eventoData = evento.data?.docRef;
     const designObj = JSON.parse(eventoData?.design);
-    // 2. Buscar si es que el email existe dentro de los usuarios del documento encontrado por id (si no existe, retornar un mensaje de error)
-    const participante = eventoData?.rows.find((row: any) => row.email === body.email);
+    // 2. Buscar participante por email O por folio (el frontend puede enviar cualquiera de los dos)
+    if (!body.email && !body.folio) {
+        return {
+            success: false,
+            error: "Datos insuficientes",
+            details: "Debe proporcionar un email o un número de folio."
+        };
+    }
+
+    const participante = eventoData?.rows.find((row: any) => {
+        const matchEmail = body.email && row.email === body.email;
+        const matchFolio = body.folio && Number(row.folio) === Number(body.folio);
+        return matchEmail || matchFolio;
+    });
 
     if (!participante) {
         return {
             success: false,
-            error: "Usuario no encontrado",
-            details: "El email proporcionado no se encuentra en la lista de participantes."
+            error: "Participante no encontrado",
+            details: "El email o folio proporcionado no coincide con ningún participante."
         };
     }
 
@@ -266,9 +283,10 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     if (matches) {
         matches.forEach((match: any) => {
             const variable = match.replace(/{{|}}/g, "").trim().toLowerCase();
-            let value = participante[variable];
+            // Búsqueda case-insensitive: soporta {{Nombre}}, {{nombre}}, {{folio}}, etc.
+            const key = Object.keys(participante).find(k => k.toLowerCase() === variable);
+            let value = key !== undefined ? participante[key] : undefined;
 
-            // Si la variable es "undefined", se asigna un string vacío para evitar errores en el PDF
             if (value == undefined) {
                 value = "";
             }
@@ -314,16 +332,17 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     // 5. pasar el email a usuarios que descargaron el pdf
     const downloadHistory = eventoData?.downloadHistory || [];
 
-    // Buscar si el email ya existe en el historial
-    const existingEntry = downloadHistory.find((entry: any) => entry.email === body.email);
+    // Buscar historial por el folio del participante (fuente de verdad de la BD)
+    const existingEntry = downloadHistory.find(
+        (entry: any) => entry.folio === participante.folio
+    );
 
     if (existingEntry) {
-        // Si existe, incrementar el contador de descargas
         existingEntry.downloads += 1;
     } else {
-        // Si no existe, agregar un nuevo registro
         downloadHistory.push({
-            email: body.email,
+            email: participante.email,
+            folio: participante.folio,
             downloads: 1,
         });
     }
