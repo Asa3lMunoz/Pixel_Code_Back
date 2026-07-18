@@ -349,9 +349,8 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     }
 
     // Actualizar el historial de descargas en Firestore
-    const { doc: firestoreDoc, updateDoc } = await import("firebase/firestore");
-    const documentRef = firestoreDoc(db, "documents", body.idEvento);
-    await updateDoc(documentRef, {
+    const documentRef = db2.collection("documents").doc(body.idEvento);
+    await documentRef.update({
         downloadHistory: downloadHistory,
         lastupdate: new Date()
     });
