@@ -20,7 +20,6 @@ RUN bun add phantomjs-prebuilt
 
 COPY src src
 COPY tsconfig.json .
-COPY .env .
 # COPY public public
 
 ENV NODE_ENV=production
