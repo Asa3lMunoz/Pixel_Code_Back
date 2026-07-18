@@ -234,6 +234,7 @@ export const createDocument = async (data: Document) => {
 
 
 export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
+    try {
     // 1. Obtener el documento por id
     const evento = await listDocumentById(body.idEvento);
     if (!evento.success) {
@@ -348,8 +349,9 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     }
 
     // Actualizar el historial de descargas en Firestore
-    const documentRef = db2.collection("documents").doc(body.idEvento);
-    await documentRef.update({
+    const { doc: firestoreDoc, updateDoc } = await import("firebase/firestore");
+    const documentRef = firestoreDoc(db, "documents", body.idEvento);
+    await updateDoc(documentRef, {
         downloadHistory: downloadHistory,
         lastupdate: new Date()
     });
@@ -358,6 +360,14 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
         message: "PDF generado correctamente.",
         data: base64
     };
+    } catch (err) {
+        console.error("Error en refactorHtmlAndDownloadPdf:", err);
+        return {
+            success: false,
+            error: "Error al generar el certificado",
+            details: err instanceof Error ? err.message : String(err)
+        };
+    }
 }
 
 // servicio que reciba una imagen y retorne la url de la imagen en firestore
