@@ -149,7 +149,7 @@ export const createDocument = async (data: Document) => {
             bannerUrl: await uploadBanner(data.bannerImg),
             headers: headers,
             rows: dataArray, // eliminar la primera fila que son los headers
-            design: data.design,
+            design: typeof data.design === 'string' ? data.design : JSON.stringify(data.design),
             showContactInfo: data.showContactInfo,
             url: "",
             template: data.template,
@@ -246,7 +246,9 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
     }
 
     const eventoData = evento.data?.docRef;
-    const designObj = JSON.parse(eventoData?.design);
+    const designObj = typeof eventoData?.design === 'string'
+        ? JSON.parse(eventoData.design)
+        : eventoData?.design;
     // 2. Buscar participante por email O por folio (el frontend puede enviar cualquiera de los dos)
     if (!body.email && !body.folio) {
         return {
