@@ -15,6 +15,14 @@ const firebaseConfig = {
     measurementId: process.env.FIREBASE_MEASUREMENT_ID,
 };
 
+const storageConfig = {
+    apiKey: process.env.FIREBASE_STORAGE2_API_KEY,
+    projectId: process.env.FIREBASE_STORAGE2_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE2_BUCKET,
+    messagingSenderId: process.env.FIREBASE_STORAGE2_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_STORAGE2_APP_ID,
+};
+
 // Initialize Firebase Admin
 const serviceAccount = {
     projectId: process.env.FIREBASE_PROJECT_ID,
@@ -44,6 +52,7 @@ let app;
 let db;
 let auth;
 let db2;
+let storageApp;
 
 try {
     app = initializeApp(firebaseConfig);
@@ -55,4 +64,11 @@ try {
     console.error('Error initializing Firebase Client:', error);
 }
 
-export { app, auth, db, db2 }
+try {
+    storageApp = initializeApp(storageConfig, 'storage-app');
+    console.log('Firebase Storage app initialized successfully');
+} catch (error) {
+    console.error('Error initializing Firebase Storage app:', error);
+}
+
+export { app, auth, db, db2, storageApp }

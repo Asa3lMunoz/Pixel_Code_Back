@@ -1,4 +1,4 @@
-import { db, app, db2 } from "../config/firebase";
+import { db, app, db2, storageApp } from "../config/firebase";
 import { asignarFolios } from "./folioService";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
@@ -375,7 +375,7 @@ export const refactorHtmlAndDownloadPdf = async (body: generateDoc) => {
 const uploadBanner = async (data: File) => {
     try {
         // Obtener referencia a Firebase Storage
-        const storage = getStorage(app);
+        const storage = getStorage(storageApp);
         const date = new Date().getTime();
         const fileName = `${date}_${data.name}`;
         const storageRef = ref(storage, `documents/banners/${fileName}`);
