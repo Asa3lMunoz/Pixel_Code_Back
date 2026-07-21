@@ -388,6 +388,7 @@ const uploadBanner = async (data: File) => {
         return await getDownloadURL(uploadTask.ref)
 
     } catch (error) {
+        console.error("Error al subir banner:", error instanceof Error ? error.message : String(error));
         return {
             success: false,
             error: "Error al subir la imagen",
